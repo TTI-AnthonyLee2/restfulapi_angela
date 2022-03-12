@@ -22,6 +22,8 @@ const Article = mongoose.model("Article", articleSchema);
 
 // RESTful API demonstartion
 
+//////////////////// Requests Targeting All Articles //////////////////////////
+
 // chained route handlers using Express
 app.route("/articles")
     // Read
@@ -61,6 +63,31 @@ app.route("/articles")
         Article.deleteMany({}, err => {
             res.send(err || `Successfully deleted all articles!`);
         });
+    });
+
+//////////////////// Requests Targeting A Specific Article //////////////////////////
+app.route("/articles/:articleTitle") // Consider url encoding
+    .get((req, res) => {
+        const articleTitle = req.params.articleTitle;
+
+        Article.findOne({title: articleTitle}, (err, foundArticle) => {
+            res.send(err || (foundArticle || "No articles matching that title was found."));
+        });
+    })
+    .put((req, res) => {
+        const articleTitle = req.params.articleTitle;
+
+        // "update" method is deprecated.
+        Article.updateOne(
+            {title: articleTitle},
+            {title: req.body.title, content: req.body.content},
+            {
+                strict: true,
+            },
+            (err, result) => {
+                res.send(err || "Successfully updated article.");
+            }
+        );
     });
 
 app.listen(3000, () => {
