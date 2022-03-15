@@ -82,10 +82,31 @@ app.route("/articles/:articleTitle") // Consider url encoding
             {title: articleTitle},
             {title: req.body.title, content: req.body.content},
             {
-                strict: true,
+                strict: true, // overwrite the whole document
             },
             (err, result) => {
                 res.send(err || "Successfully updated article.");
+            }
+        );
+    })
+    .patch((req, res) => {
+        const articleTitle = req.params.articleTitle;
+        console.log(req.body);
+        Article.updateOne(
+            {title: articleTitle},
+            {$set: req.body}, // use mongoDB syntax
+            (err, result) => {
+                res.send(err || "Successfully updated article.");
+            }
+        );
+    })
+    .delete((req, res) => {
+        const articleTitle = req.params.articleTitle;
+        Article.deleteOne(
+            {title: articleTitle},
+            (err, result) => {
+                console.log(result);
+                res.send(err || "Successfully deleted the article.");
             }
         );
     });
